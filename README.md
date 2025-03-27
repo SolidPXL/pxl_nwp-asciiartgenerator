@@ -20,13 +20,16 @@ Benternet  requires two sockets to be created
 
 `tcp://benternet.pxl-ea-ict.be:24042` Publish socket of benternet, Here responses will be sent to that have been broadcasted through the network.
 
-
-
 On the server listen socket you are responsible for requesting the ASCII service. The ASCII server will expect a request with the following structure
 
 `asciigenerator>[username]>[service]>[argument]>[parameters]`
 
 The parameters are variable in length and depends on the service being called. Each parameter has to be provided in the right sequence and has to be seperated by the `>` delimiter.
+
+After the service received your request it will process and send a response on with the following format
+`asciigenerator>[userame]>[response]`
+
+It may be possible that the response is preceded by a `\n\r` to make sure ASCII art is aligned properly in your terminal.
 
 ### username
 
