@@ -4,8 +4,15 @@
 #include <string.h>
 
 #ifdef __unix__
-     #include <unistd.h>
-     #define Sleep(x) sleep(x)
+    #include <unistd.h>
+    #include <time.h>
+
+    static inline void Sleep(unsigned int milliseconds) {
+        struct timespec ts;
+        ts.tv_sec = milliseconds / 1000;  // Seconds
+        ts.tv_nsec = (milliseconds % 1000) * 1000000; // Nanoseconds
+        nanosleep(&ts, NULL);
+    }
 #else
     #include <windows.h>
 
@@ -25,10 +32,10 @@ int main( int argc, char * argv[] )
     zmq_connect( receiver, "tcp://benternet.pxl-ea-ict.be:24042" );
     zmq_setsockopt(receiver,ZMQ_SUBSCRIBE,prefix,sizeof(prefix)-1);
 
-    
     char anounce[] = "asciigenerator>Ascii generator is running on the network";
 	zmq_send( sender, anounce, sizeof(anounce), 0 );
 
+    sleep(1);
     //Receiving requests
     //while(1){
         char buffer[256] = {'\0'};
@@ -43,19 +50,15 @@ int main( int argc, char * argv[] )
             printf("Nothing received");
         }
         buffer[256] = '\0';
-        printf("buffer: %s\n",buffer);
 
         //Parse arguments
         char * tok;
         tok = strtok (buffer,">");
         tok = strtok (NULL,">");
-        printf("first tok username %s\n",tok);
         strcpy(username,tok);
         tok = strtok (NULL, ">");
-        printf("second tok service %s\n", tok);
         strcpy(service,tok);
         tok = strtok (NULL, ">");
-        printf("third tok argument %s\n", tok);
         int i=0;
         while(tok!=NULL){
             printf("loop tok\n");
@@ -67,10 +70,8 @@ int main( int argc, char * argv[] )
             i++;
 
         }
-        printf("finished looping\n");
         char responsebuf[480] = {'\0'};
         sprintf(responsebuf,"asciigenerator>%s>You have requested the %s service, sadly this is still unavailable",username,service);
-        printf("sprinted f\n");
 
         zmq_send(sender,responsebuf, sizeof(responsebuf),0);
         
