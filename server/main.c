@@ -61,6 +61,11 @@ int main( int argc, char * argv[] )
 
             tok = strtok (NULL, ">");
             i++;
+
+            char responsebuf[124];
+            sprintf(responsebuf,"asciigenerator>%s>You have requested the %s service, sqdly this is still unavailable",username,service);
+
+            zmq_send(sender,responsebuf, sizeof(responsebuf),0);
         }
         return 0;
 
