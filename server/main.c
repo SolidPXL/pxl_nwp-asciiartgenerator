@@ -28,10 +28,9 @@ int main( int argc, char * argv[] )
     
     char anounce[] = "asciigenerator>Ascii generator is running on the network";
 	zmq_send( sender, anounce, sizeof(anounce), 0 );
-    Sleep(500);
 
     //Receiving requests
-    while(1){
+    //while(1){
         char buffer[256] = {'\0'};
         int size = zmq_recv(receiver,buffer,sizeof(buffer),0);
 
@@ -49,12 +48,17 @@ int main( int argc, char * argv[] )
         //Parse arguments
         char * tok;
         tok = strtok (buffer,">");
+        tok = strtok (NULL,">");
+        printf("first tok username %s\n",tok);
         strcpy(username,tok);
         tok = strtok (NULL, ">");
+        printf("second tok service %s\n", tok);
         strcpy(service,tok);
         tok = strtok (NULL, ">");
+        printf("third tok argument %s\n", tok);
         int i=0;
         while(tok!=NULL){
+            printf("loop tok\n");
             char* parameter = malloc(64);
             strcpy(parameter,tok);
             parameterlist[i] = parameter;
@@ -62,19 +66,26 @@ int main( int argc, char * argv[] )
             tok = strtok (NULL, ">");
             i++;
 
-            char responsebuf[124];
-            sprintf(responsebuf,"asciigenerator>%s>You have requested the %s service, sqdly this is still unavailable",username,service);
-
-            zmq_send(sender,responsebuf, sizeof(responsebuf),0);
         }
-        return 0;
+        printf("finished looping\n");
+        char responsebuf[480] = {'\0'};
+        sprintf(responsebuf,"asciigenerator>%s>You have requested the %s service, sadly this is still unavailable",username,service);
+        printf("sprinted f\n");
+
+        zmq_send(sender,responsebuf, sizeof(responsebuf),0);
+        
 
         //free memory of parameterlist
         for(int i=0;i<8;i++){
-            free(parameterlist[i]);
+            if(parameterlist[i]!=NULL){
+                free(parameterlist[i]);
+            }
+            
         }
 
-    }
+        //return 0;
+
+    //}
 
 	zmq_close( sender );
     zmq_close( receiver );
