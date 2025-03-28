@@ -1,7 +1,15 @@
 #include <stdio.h>
 #include <zmq.h>
-#include <windows.h>
+#include <stdlib.h>
 #include <string.h>
+
+#ifdef __unix__
+     #include <unistd.h>
+     #define Sleep(x) sleep(x)
+#else
+    #include <windows.h>
+
+#endif
 
 void * context; //Global context, because you only need one !
 
@@ -15,17 +23,17 @@ int main( int argc, char * argv[] )
 
     void* receiver = zmq_socket(context, ZMQ_SUB);
     zmq_connect( receiver, "tcp://benternet.pxl-ea-ict.be:24042" );
-    zmq_setsockopt(subber,ZMQ_SUBSCRIBE,prefix,sizeof(rectopic)-1);
+    zmq_setsockopt(receiver,ZMQ_SUBSCRIBE,prefix,sizeof(prefix)-1);
 
     
-    char anounce[] = "asciigenerator>Ascii generator is running on the network"
+    char anounce[] = "asciigenerator>Ascii generator is running on the network";
 	zmq_send( sender, anounce, sizeof(anounce), 0 );
     Sleep(500);
 
     //Receiving requests
     while(1){
         char buffer[256] = {'\0'};
-        int size = zmq_recv(subber,buffer,sizeof(buffer),0);
+        int size = zmq_recv(receiver,buffer,sizeof(buffer),0);
 
         char username[64] = {'\0'};
         char service[64] = {'\0'};
@@ -48,7 +56,7 @@ int main( int argc, char * argv[] )
         int i=0;
         while(tok!=NULL){
             char* parameter = malloc(64);
-            memccpy(parameter,tok);
+            strcpy(parameter,tok);
             parameterlist[i] = parameter;
 
             tok = strtok (NULL, ">");
@@ -58,7 +66,7 @@ int main( int argc, char * argv[] )
 
         //free memory of parameterlist
         for(int i=0;i<8;i++){
-            free(parameterlist[i])
+            free(parameterlist[i]);
         }
 
     }
