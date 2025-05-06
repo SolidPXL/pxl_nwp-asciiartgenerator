@@ -29,7 +29,7 @@ void *send_messages(void *context) {
     return NULL;
 }
 
-char prefix[] = "asciigenerator>";
+char prefix[] = "asciigenerator!>";
 
 void *receive_messages(void *context) {
     void *receiver = zmq_socket(context, ZMQ_SUB);

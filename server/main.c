@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+//build command
+//gcc 
+
 #ifdef __unix__
     #include <unistd.h>
     #include <time.h>
@@ -18,12 +21,12 @@
 
 #endif
 
-void * context; //Global context, because you only need one !
+void * context;
 
 int main( int argc, char * argv[] )
 {
 	context = zmq_ctx_new();
-    char prefix[] = "asciigenerator>";
+    char prefix[] = "asciigenerator?>";
 
 	void * sender = zmq_socket( context, ZMQ_PUSH );
 	zmq_connect( sender, "tcp://benternet.pxl-ea-ict.be:24041" );
@@ -32,12 +35,12 @@ int main( int argc, char * argv[] )
     zmq_connect( receiver, "tcp://benternet.pxl-ea-ict.be:24042" );
     zmq_setsockopt(receiver,ZMQ_SUBSCRIBE,prefix,sizeof(prefix)-1);
 
-    char anounce[] = "asciigenerator>Ascii generator is running on the network";
+    char anounce[] = "asciigenerator!>Ascii generator is running on the network";
 	zmq_send( sender, anounce, sizeof(anounce), 0 );
 
     sleep(1);
     //Receiving requests
-    //while(1){
+    while(1){
         char buffer[256] = {'\0'};
         int size = zmq_recv(receiver,buffer,sizeof(buffer),0);
 
@@ -49,7 +52,6 @@ int main( int argc, char * argv[] )
         if(size<0){
             printf("Nothing received");
         }
-        buffer[256] = '\0';
 
         //Parse arguments
         char * tok;
@@ -71,7 +73,7 @@ int main( int argc, char * argv[] )
 
         }
         char responsebuf[480] = {'\0'};
-        sprintf(responsebuf,"asciigenerator>%s>You have requested the %s service, sadly this is still unavailable",username,service);
+        sprintf(responsebuf,"asciigenerator!>%s>You have requested the %s service, sadly this is still unavailable",username,service);
 
         zmq_send(sender,responsebuf, sizeof(responsebuf),0);
         
@@ -86,7 +88,7 @@ int main( int argc, char * argv[] )
 
         //return 0;
 
-    //}
+    }
 
 	zmq_close( sender );
     zmq_close( receiver );
