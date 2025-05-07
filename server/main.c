@@ -2,9 +2,11 @@
 #include <zmq.h>
 #include <stdlib.h>
 #include <string.h>
+#include "asciiservice_lib.h"
+#include "services.h"
 
 //build command
-//gcc 
+//gcc main.c asciiservice_lib.c services.c -o main -lzmq
 
 #ifdef __unix__
     #include <unistd.h>
@@ -43,50 +45,61 @@ int main( int argc, char * argv[] )
     while(1){
         char buffer[256] = {'\0'};
         int size = zmq_recv(receiver,buffer,sizeof(buffer),0);
-
-        char username[64] = {'\0'};
-        char service[64] = {'\0'};
-        //First item in parameterlist is argument since some services have no argument
-        char* parameterlist[8] = {NULL};
+        ServiceError result = SUCCESS;
 
         if(size<0){
             printf("Nothing received");
         }
 
         //Parse arguments
-        char * tok;
-        tok = strtok (buffer,">");
-        tok = strtok (NULL,">");
-        strcpy(username,tok);
-        tok = strtok (NULL, ">");
-        strcpy(service,tok);
-        tok = strtok (NULL, ">");
-        int i=0;
-        while(tok!=NULL){
-            printf("loop tok\n");
-            char* parameter = malloc(64);
-            strcpy(parameter,tok);
-            parameterlist[i] = parameter;
-
-            tok = strtok (NULL, ">");
-            i++;
-
+        struct Service_Request req = {
+            .service = SERVICE_HELP,
+            .username = {'\0'},
+            .parameterlist = NULL
+        };
+        struct Service_Response res = {
+            .response = NULL,
+            .size = 0
+        };
+        result = parse_request(buffer,sizeof(buffer),&req);
+        if(result!=SUCCESS){
+            handle_error(result,&req,&res);
+            send_and_clean_response(sender,&res);
+            return 0;
         }
-        char responsebuf[480] = {'\0'};
-        sprintf(responsebuf,"asciigenerator!>%s>You have requested the %s service, sadly this is still unavailable",username,service);
+        
 
-        zmq_send(sender,responsebuf, sizeof(responsebuf),0);
+        //Service handler
+        ServiceError (*servicefunc[SERVICE_AMOUNT])(struct Service_Request*,struct Service_Response*) = {
+            service_help,
+            service_invalid,
+            service_invalid,
+            service_invalid,
+            service_invalid
+        };
+        result = servicefunc[req.service](&req,&res);
+        if(result!=SUCCESS){
+            //Error handling
+        }
+        
+        // char responsebuf[480] = {'\0'};
+        print_request(&req);
+        // sprintf(responsebuf,"asciigenerator!>%s>You have requested the %s service, sadly this is still unavailable",req.username,service_to_string(req.service));
+
+
+        // zmq_send(sender,responsebuf, sizeof(responsebuf),0);
+
+        send_and_clean_response(sender,&res);
         
 
         //free memory of parameterlist
         for(int i=0;i<8;i++){
-            if(parameterlist[i]!=NULL){
-                free(parameterlist[i]);
+            if(req.parameterlist[i]!=NULL){
+                free(req.parameterlist[i]);
             }
             
         }
 
-        //return 0;
 
     }
 
