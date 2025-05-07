@@ -10,6 +10,19 @@ The service running on the benternet network from PXL will provide a quick and e
 
 - Subscription-based changelog for font updates
 
+## Installation
+A portable executable is available from the releases page.
+
+You can also compile it from source
+
+1. download and extract source code
+2. Make sure you have the [ZeroMQ](https://zeromq.org/download/) library installed
+3. run `cd client`
+4. run `make`
+5. run `cd ../server`
+6. run `make`
+7. run the generated executables
+
 ## Usage
 
 First connect to the benternet service. Benternet is a relay service that receives information and relays requests to each running service.  Create a socket to connect to the network
