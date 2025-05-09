@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <zmq.h>
 
+#include <dirent.h>
+//TODO add windows conversions for fileIO
+
 typedef enum Service Service;
 enum Service{
     SERVICE_HELP,
@@ -49,5 +52,7 @@ void clean_req(struct Service_Request* req);
 void clean_res(struct Service_Response* req);
 
 void print_request(struct Service_Request* req);
+
+uint8_t** get_fonts();
 
 #endif

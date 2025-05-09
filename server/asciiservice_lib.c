@@ -1,4 +1,5 @@
 #include "asciiservice_lib.h"
+#include <dirent.h>
 
 
 Service parse_service(char* buf){
@@ -114,4 +115,51 @@ void print_request(struct Service_Request* req){
         if(req->parameterlist[i]==NULL) break;
         printf("param %d : %s\n",i,req->parameterlist[i]);
     }
+}
+
+void remove_extension(char *filename) {
+    char *dot = strrchr(filename, '.');
+    if (dot && dot != filename) {
+        *dot = '\0'; // Remove extension
+    }
+}
+
+uint16_t strcpy_stashed(char* buf,char* src,uint16_t start,uint16_t max){
+    //join all strings seperated by \0 end string with two
+}
+
+uint8_t** get_fonts(){
+    const char *folder_path = "./fonts";
+    struct dirent *entry;
+    DIR *dir = opendir(folder_path);
+
+    if (!dir) {
+        perror("opendir");
+        return NULL;
+    }
+
+    char name_buffer[1024] = {'\0'};
+    int entries=0;
+    int l=0;
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type == DT_REG) { // Regular file
+            char filename[256];
+            strncpy(filename, entry->d_name, sizeof(filename));
+            filename[sizeof(filename) - 1] = '\0'; // Ensure null-termination
+
+            remove_extension(filename);
+            strcpy_stashed(name_buffer,filename,l,sizeof(name_buffer)-1);
+            entries++;
+            
+            printf("%s\n", filename);
+        }
+    }
+
+    //copy name buffer with an exact size
+
+    //create array with pointers to start of filenames. last entry being NULL
+
+    closedir(dir);
+    return 0;
 }

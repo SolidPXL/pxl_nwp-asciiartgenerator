@@ -6,7 +6,7 @@
 #include "services.h"
 
 //build command
-//gcc main.c asciiservice_lib.c services.c -o main -lzmq
+//gcc main.c asciiservice_lib.c services.c -o main -D_DEFAULT_SOURCE -lzmq
 
 #ifdef __unix__
     #include <unistd.h>
@@ -65,7 +65,7 @@ int main( int argc, char * argv[] )
         if(result!=SUCCESS){
             handle_error(result,&req,&res);
             send_and_clean_response(sender,&res);
-            return 0;
+            continue;
         }
         
 
