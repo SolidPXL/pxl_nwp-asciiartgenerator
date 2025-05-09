@@ -37,7 +37,7 @@ void *receive_messages(void *context) {
     zmq_setsockopt(receiver,ZMQ_SUBSCRIBE,prefix,sizeof(prefix)-1);
     //zmq_bind(receiver, RECEIVE_PORT);
 
-    char buffer[256];
+    char buffer[1024];
     while (1) {
         memset(buffer, 0, sizeof(buffer));
         zmq_recv(receiver, buffer, sizeof(buffer) - 1, 0);

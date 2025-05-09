@@ -11,6 +11,7 @@ The service running on the benternet network from PXL will provide a quick and e
 - Subscription-based changelog for font updates
 
 ## Installation
+
 A portable executable is available from the releases page.
 
 You can also compile it from source
@@ -22,6 +23,16 @@ You can also compile it from source
 5. run `cd ../server`
 6. run `make`
 7. run the generated executables
+
+```mermaid
+flowchart TD
+    B[Made request] --> C[Parse username, service, argument and parameters]
+    C --> D[Fetch user settings]
+    D --> E[Send request to service handler]
+    E --> F{Error?}
+    F --> |yes| H[Send correct error response]
+    F --> |no| G[Send response to client]
+```
 
 ## Usage
 
