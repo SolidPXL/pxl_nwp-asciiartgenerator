@@ -34,11 +34,25 @@ ServiceError service_fonts(struct Service_Request* req, struct Service_Response*
     if(res->response!=NULL) return RESPONSE_NOT_EMPTY;
 
     char buffer[2048] = {'\0'};
-    sprintf(buffer,"asciigenerator!>%s>You have requested the %s service, sadly this is still unavailable",req->username,service_to_string(req->service));
+    sprintf(buffer,"asciigenerator!>%s>currently the following fonts are available:\n",req->username);
+
+    uint8_t** fonts = get_fonts();
+    
+    int i=0;
+    while (fonts[i]!=NULL)
+    {
+        char temp[124] = {'\n'};
+        sprintf(temp,"- %s\n",fonts[i]);
+        strcat(buffer,temp);
+        i++;
+    }
 
     res->size = strlen(buffer);
     res->response = malloc(res->size);
     memcpy(res->response,buffer,res->size);
+
+    // free(fonts[0]);
+    // free(fonts);
 
     return SUCCESS;
 }

@@ -1,5 +1,6 @@
 #include "asciiservice_lib.h"
 #include <dirent.h>
+#include <stdlib.h>
 
 
 Service parse_service(char* buf){
@@ -125,7 +126,18 @@ void remove_extension(char *filename) {
 }
 
 uint16_t strcpy_stashed(char* buf,char* src,uint16_t start,uint16_t max){
-    //join all strings seperated by \0 end string with two
+    //join all strings seperated by \0
+    int i = start;
+    int j = 0;
+
+    while (i<max)
+    {
+        buf[i] = src[j];
+        i++;
+        j++;
+        if(src[j-1] == '\0') break;
+    }
+    return i;
 }
 
 uint8_t** get_fonts(){
@@ -149,17 +161,40 @@ uint8_t** get_fonts(){
             filename[sizeof(filename) - 1] = '\0'; // Ensure null-termination
 
             remove_extension(filename);
-            strcpy_stashed(name_buffer,filename,l,sizeof(name_buffer)-1);
+            l = strcpy_stashed(name_buffer,filename,l,sizeof(name_buffer)-1);
             entries++;
             
-            printf("%s\n", filename);
+            //printf("%s\n", filename);
         }
     }
 
+    if(entries==0) {
+        closedir(dir);
+        return NULL;
+    }
+
     //copy name buffer with an exact size
+    uint8_t* str = malloc(l);
+    memcpy(str,name_buffer,l);
 
     //create array with pointers to start of filenames. last entry being NULL
+    uint8_t** ptrarr = malloc(entries*sizeof(uint8_t*)+1);
+    int i = 0;
+    int e = 1;
+    ptrarr[0] = str;
+    while (e<entries)
+    {
+        if(str[i]=='\0'){
+            ptrarr[e] = &(str[i+1]);
+            e++;
+        }
+        i++;
+    }
+    ptrarr[entries] = NULL;
+    
+    //Note to self: dont forget to first free the pointer at[0] before freeing the pointer itself
+    
 
     closedir(dir);
-    return 0;
+    return ptrarr;
 }

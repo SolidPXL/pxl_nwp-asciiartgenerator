@@ -72,7 +72,7 @@ int main( int argc, char * argv[] )
         //Service handler
         ServiceError (*servicefunc[SERVICE_AMOUNT])(struct Service_Request*,struct Service_Response*) = {
             service_help,
-            service_invalid,
+            service_fonts,
             service_invalid,
             service_invalid,
             service_invalid
@@ -81,13 +81,8 @@ int main( int argc, char * argv[] )
         if(result!=SUCCESS){
             //Error handling
         }
-        
-        // char responsebuf[480] = {'\0'};
+
         print_request(&req);
-        // sprintf(responsebuf,"asciigenerator!>%s>You have requested the %s service, sadly this is still unavailable",req.username,service_to_string(req.service));
-
-
-        // zmq_send(sender,responsebuf, sizeof(responsebuf),0);
 
         send_and_clean_response(sender,&res);
         
