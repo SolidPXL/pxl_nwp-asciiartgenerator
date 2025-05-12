@@ -5,10 +5,13 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <zmq.h>
 
 #include <dirent.h>
 //TODO add windows conversions for fileIO
+#define MAX_LINE_WIDTH 256
 
 typedef enum Service Service;
 enum Service{
@@ -24,8 +27,19 @@ typedef enum Service_Error ServiceError;
 enum Service_Error{
     SUCCESS,
     NOT_ENOUGH_ARGUMENTS,
+    TOO_MANY_ARGUMENTS,
     WRONG_ARUMENTS,
-    RESPONSE_NOT_EMPTY
+    RESPONSE_NOT_EMPTY,
+    FONT_NOT_FOUND,
+    OTHER_ERROR
+};
+
+typedef enum Generator_Overlap Generator_Overlap;
+enum Generator_Overlap{
+    NOOVERLAP,
+    LEFTONTOP,
+    RIGHTONTOP,
+    PRIORITY
 };
 
 struct Service_Request {
@@ -54,5 +68,7 @@ void clean_res(struct Service_Response* req);
 void print_request(struct Service_Request* req);
 
 uint8_t** get_fonts();
+
+uint8_t* generate_text(uint8_t* font, uint8_t* text,uint8_t size,uint8_t spacing);
 
 #endif

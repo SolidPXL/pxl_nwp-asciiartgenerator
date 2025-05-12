@@ -51,8 +51,31 @@ ServiceError service_fonts(struct Service_Request* req, struct Service_Response*
     res->response = malloc(res->size);
     memcpy(res->response,buffer,res->size);
 
-    // free(fonts[0]);
-    // free(fonts);
+    free(fonts[0]);
+    free(fonts);
+
+    return SUCCESS;
+}
+
+ServiceError service_generate(struct Service_Request* req, struct Service_Response* res){
+    if(res->response!=NULL) return RESPONSE_NOT_EMPTY;
+
+    char buffer[2048] = {'\0'};
+    sprintf(buffer,"asciigenerator!>%s>\n",req->username);
+
+    uint8_t* text = generate_text(req->parameterlist[0],req->parameterlist[2],atoi(req->parameterlist[1]),1);
+    if(text==NULL){
+        return OTHER_ERROR;
+    }
+    strcat(buffer,text);
+    // uint16_t len = strlen(buffer);
+    // buffer[len-2]='\0';
+
+    res->size = strlen(buffer);
+    res->response = malloc(res->size);
+    memcpy(res->response,buffer,res->size);
+
+    free(text);
 
     return SUCCESS;
 }

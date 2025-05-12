@@ -30,6 +30,7 @@ int main( int argc, char * argv[] )
 	context = zmq_ctx_new();
     char prefix[] = "asciigenerator?>";
 
+
 	void * sender = zmq_socket( context, ZMQ_PUSH );
 	zmq_connect( sender, "tcp://benternet.pxl-ea-ict.be:24041" );
 
@@ -46,6 +47,7 @@ int main( int argc, char * argv[] )
         char buffer[256] = {'\0'};
         int size = zmq_recv(receiver,buffer,sizeof(buffer),0);
         ServiceError result = SUCCESS;
+
 
         if(size<0){
             printf("Nothing received");
@@ -73,7 +75,7 @@ int main( int argc, char * argv[] )
         ServiceError (*servicefunc[SERVICE_AMOUNT])(struct Service_Request*,struct Service_Response*) = {
             service_help,
             service_fonts,
-            service_invalid,
+            service_generate,
             service_invalid,
             service_invalid
         };

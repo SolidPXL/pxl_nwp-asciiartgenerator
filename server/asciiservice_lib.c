@@ -198,3 +198,226 @@ uint8_t** get_fonts(){
     closedir(dir);
     return ptrarr;
 }
+
+uint16_t get_fony_offset(uint8_t* fontheights, uint8_t size){
+    uint16_t res = 0;
+    for(int i=0;i<16;i++){
+        if(i==size-1)break;
+        res += fontheights[i]+1;
+    }
+
+    return res;
+}
+
+uint16_t get_char_position(char c) {
+    if (c >= 'A' && c <= 'Z') {
+        return c - 'A';
+    } else if (c >= 'a' && c <= 'z') {
+        return c - 'a' + 26;
+    } else {
+        return -1; // Invalid character
+    }
+}
+
+uint16_t getLineNum(char character, uint16_t lines_per_font){
+    uint16_t res = 1;
+    res += (get_char_position(character) * lines_per_font);
+
+    return res;
+}
+
+uint32_t buffer_length(uint8_t* buf, uint16_t max){
+    uint32_t res = 0;
+    while(buf[res]!='\0'&&res<max){
+        res++;
+    }
+
+    return res+1;
+}
+
+void setLineStart(uint16_t linenum,FILE* file){
+    rewind(file);
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int current_line = 1;
+
+    while ((read = getline(&line, &len, file)) != -1) {
+        if (current_line == linenum) {
+            break;
+        }
+        current_line++;
+    }
+
+    free(line);
+
+}
+
+void copy_string(uint8_t* dst, uint8_t* src){
+    int i = 0;
+    while(dst[i] != '\0'){  
+        i++;
+    }
+    int j=0;
+    while(src[j] != '\0' && src[j] != '\n' && src[j] != '\r'){
+        dst[i] = src[j];
+        j++;
+        i++;
+        // printf("j %d i %d\n",j,i);
+    }
+}
+
+uint8_t* generate_text(uint8_t* font, uint8_t* text,uint8_t size ,uint8_t spacing){
+    uint8_t fontpath[64];
+    strcpy(fontpath,"./fonts/");
+    strcat(fontpath,font);
+    strcat(fontpath,".txt");
+    FILE *fp = fopen(fontpath, "r");
+    if (!fp) {
+        return NULL;
+    }
+
+    //Parse font header
+    char* header_buf = NULL;
+    size_t len = 0;
+    getline(&header_buf,&len,fp);
+
+    uint8_t fontheights[16] = {0};//Assuming there are not more than 16 fonts height variations not exceeding 32 characters high
+    uint16_t lines_per_font = 0;
+    Generator_Overlap overlap = NOOVERLAP;
+    
+    uint8_t* tok = strtok(header_buf,";");
+    tok = strtok(NULL,";");
+
+    //parse overlap
+    if(tok == NULL){
+        return NULL;
+    }
+    overlap = atoi(tok);
+
+    //parse fontsizes
+    tok = strtok(header_buf, ":");
+    {
+        int i=0;
+        while(tok!=NULL){
+            if(i>=16) break;
+            fontheights[i] = atoi(tok);
+            i++;
+            
+            tok = strtok(NULL,":");
+        }  
+    }
+
+    for(int i=0;i<16;i++){
+        if(fontheights[i]==0) break;
+        lines_per_font += fontheights[i]+1;
+    }
+
+
+    //Create line buffers for generator
+    uint8_t fontheight = fontheights[size-1];
+    char** lines = malloc(fontheight*sizeof(uint8_t*));
+    for(int i=0;i<fontheight;i++){
+        lines[i] = malloc(MAX_LINE_WIDTH);
+        memset(lines[i],'\0',MAX_LINE_WIDTH);
+    }
+
+
+    //Run font lookups
+    {
+        char spacings[64] = {'\0'};
+        for(int j=0;j<spacing;j++){
+            spacings[j]=' ';
+        }
+
+        int i=0;
+        while(text[i]!='\0'){
+            char* char_header_buf = NULL;
+            //char* line_buf = NULL;
+            size_t len = 0;
+            //set line to line before character header
+            setLineStart(getLineNum(text[i],lines_per_font)+get_fony_offset(fontheights,size),fp);
+
+            //read character information
+            char currentchar;
+            uint8_t height;
+            uint8_t width;
+            uint8_t overlap_prio;
+            uint8_t right_overlap;
+            getline(&char_header_buf,&len,fp);
+            char* tok = strtok(char_header_buf,";");
+            currentchar = tok[0];
+            tok = strtok(NULL,";");
+            height = atoi(tok);
+            tok = strtok(NULL,";");
+            width = atoi(tok);
+            tok = strtok(NULL,";");
+            overlap_prio = atoi(tok);
+            tok = strtok(NULL,";");
+            right_overlap = atoi(tok);
+            
+            //read character
+            char* line_buf = NULL;
+            for(int i=0;i<fontheight;i++){
+                getline(&line_buf,&len,fp);
+
+                copy_string(lines[i],line_buf);
+                copy_string(lines[i],spacings);
+            }
+            
+
+            i++;
+        }
+    }
+
+    // for(int i=0;i<fontheight;i++){
+    //     printf("%s\n",lines[i]);
+    // }
+
+    // printf("\n");
+
+    //stitch buffer
+    uint16_t temp[32] = {0};
+    uint32_t total_buf = 0;
+    for(int i=0;i<fontheight;i++){
+        temp[i] = buffer_length(lines[i],MAX_LINE_WIDTH);
+        lines[i][temp[i]-1] = '\n';
+        lines[i][temp[i]] = '\r';
+        total_buf += temp[i];
+    }
+
+    uint8_t* returnbuf = malloc(total_buf);
+    uint32_t compound = 0;
+    for(int i=0;i<fontheight;i++){
+        memcpy(returnbuf + compound,lines[i],temp[i]);
+        compound += temp[i];
+        free(lines[i]);
+    }
+
+    // for(int i=0;i<fontheight;i++){
+    //     printf("%s\n",lines[i]);
+    // }
+    printf("%s\n-----",returnbuf);
+
+    //clean bottom gunk
+    int linecounter = 0;
+    int j=0;
+    while(j<total_buf){
+        if(returnbuf[j]=='\r'||returnbuf[j]=='\n'){
+            linecounter++;
+        }
+        if(linecounter>=(fontheight)){
+            returnbuf[j]='\0';
+        }
+        j++;
+    }
+
+
+
+
+    //return result
+    fclose(fp);
+    return returnbuf;
+
+    
+};
