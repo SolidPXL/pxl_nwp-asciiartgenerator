@@ -1,5 +1,7 @@
 # Benternet ASCII art service
 
+![](./title.png)
+
 The service running on the benternet network from PXL will provide a quick and easy way to convert text into ascii art. Building a pretty CLI has never been easier. Additionally there is a service that you can subscribe to that will notify if new fonts are available. 
 
 ## Features
@@ -25,13 +27,12 @@ You can also compile it from source
 7. run the generated executables
 
 ```mermaid
-flowchart TD
-    B[Made request] --> C[Parse username, service, argument and parameters]
-    C --> D[Fetch user settings]
-    D --> E[Send request to service handler]
-    E --> F{Error?}
-    F --> |yes| H[Send correct error response]
-    F --> |no| G[Send response to client]
+sequenceDiagram
+    Client->>+Server: Request service
+    Server->>+Filestorage: Fetch user settings
+    Filestorage-->>+Server: Return all user settings
+    Server->-Server: Process request by service handler
+    Server-->>Client: Send response
 ```
 
 ## Usage
@@ -73,6 +74,27 @@ The help service gives a detailed description about a service. If invalid argume
 
 Help expect the name of the service as an argument
 
+#### Example
+
+```
+asciigenerator?>solid>help
+```
+
+```
+Usage of the service:
+Follow the syntax: asciigenerator?>[username]>[service]>[argument]>[parameters]
+Available services:
+- help: shows this screen
+  usage: >help
+- fonts: shows all available fonts
+  usage: >fonts
+- generate: turn text into ascii
+  usage: >generate>[font]>[optional parameters]>[text]
+- settings: change user specific settings
+  usage: >settings>[setting]>[value]
+More info available on github https://github.com/SolidPXL/pxl_nwp-asciiartgenerator
+```
+
 ### Fonts
 
 The fonts service provides a list of available fonts on the service.
@@ -80,6 +102,19 @@ The fonts service provides a list of available fonts on the service.
 #### Expected arguments/parameters
 
 Fonts expect no arguments or parameters
+
+#### Example
+
+```
+asciigenerator?>solid>fonts
+```
+
+```
+currently the following fonts are available:
+- bold
+- cursive
+- ...
+```
 
 ### generate
 
@@ -89,7 +124,67 @@ The generate service is the bread and butter of the service. It converts a strin
 
 generate expect a font, all fonts can found by running the fonts service or by checking the [Fonts]() section
 
-The font is followed by optional font parameters. The last parameter is always the text that has to be converted to ASCII art
+The font is followed by optional font parameters. The first parameter is the size variant and the last parameter is always the text that has to be converted to ASCII art.
+Some fonts may have up to 6 additional parameters but this is font specific.
+
+#### Examples
+
+```
+asciigenerator?>solid>generate>bold>2>AUB
+```
+
+```
+    █     ██    ██ ██████   
+    █     ██    ██ ██    █  
+   █ █    ██    ██ ██     █ 
+   █ █    ██    ██ ██     █ 
+  █   █   ██    ██ ██    █  
+  █   █   ██    ██ ██████   
+ █     █  ██    ██ ██    █  
+ █     █  ██    ██ ██     █ 
+ ███████  ██    ██ ██     █ 
+█       █ ██    ██ ██     █ 
+█       █ ██    ██ ██    █  
+█       █ ████████ ██████   
+```
+
+
+
+```
+asciigenerator?>solid>generate>bold>1>Goede
+```
+
+```
+████              █      
+█          ██     █  ██  
+█    ████ █  █    █ █  █ 
+█ ██ █  █ ████ ████ ████ 
+█  █ █  █ █    █  █ █    
+████ ████ ████ ████ ████  
+```
+
+
+
+```
+asciigenerator?>solid>generate>bold>2>AUB
+```
+
+```
+    █     ██    ██ ██████   
+    █     ██    ██ ██    █  
+   █ █    ██    ██ ██     █ 
+   █ █    ██    ██ ██     █ 
+  █   █   ██    ██ ██    █  
+  █   █   ██    ██ ██████   
+ █     █  ██    ██ ██    █  
+ █     █  ██    ██ ██     █ 
+ ███████  ██    ██ ██     █ 
+█       █ ██    ██ ██     █ 
+█       █ ██    ██ ██    █  
+█       █ ████████ ██████   
+```
+
+
 
 ### settings
 
@@ -106,7 +201,3 @@ The color argument followed by the parameter `true` or `false` will set the usag
 The service will also broadcast if new fonts have been added. Users can subscribe to the news by listening for messages that start with `asciigenerator!>broadcast>newfont>`
 
 After that it will anounce the name of the new font.
-
-## Examples
-
-*To do*
