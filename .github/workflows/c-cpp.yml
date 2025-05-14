@@ -1,0 +1,45 @@
+name: C CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libzmq3-dev
+
+    - name: Build client and server
+      run: |
+        make -C client
+        make -C server
+
+    - name: Build client
+      run: make -C client
+
+    - name: Build server
+      run: make -C server
+
+    - name: Rename binaries
+      run: |
+        mv client/client client-linux
+        mv server/server server-linux
+
+    - name: Upload client binary
+      uses: softprops/action-gh-release@v2
+      with:
+        files: client-linux
+
+    - name: Upload server binary
+      uses: softprops/action-gh-release@v2
+      with:
+        files: server-linux
