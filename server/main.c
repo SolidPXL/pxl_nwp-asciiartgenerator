@@ -57,7 +57,10 @@ int main( int argc, char * argv[] )
         struct Service_Request req = {
             .service = SERVICE_HELP,
             .username = {'\0'},
-            .parameterlist = NULL
+            .parameterlist = NULL,
+            .settings = {
+                .color = ANSI_RESET
+            }
         };
         struct Service_Response res = {
             .response = NULL,
@@ -69,6 +72,13 @@ int main( int argc, char * argv[] )
             send_and_clean_response(sender,&res);
             continue;
         }
+        result = fetch_settings(req.username,&(req.settings));
+        if(result!=SUCCESS){
+            handle_error(result,&req,&res);
+            send_and_clean_response(sender,&res);
+            continue;
+        }
+        printf("Loaded user settings with color set to %d\n",req.settings.color);
         
 
         //Service handler
@@ -76,7 +86,7 @@ int main( int argc, char * argv[] )
             service_help,
             service_fonts,
             service_generate,
-            service_invalid,
+            service_settings,
             service_invalid
         };
         result = servicefunc[req.service](&req,&res);

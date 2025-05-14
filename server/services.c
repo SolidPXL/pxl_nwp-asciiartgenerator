@@ -80,6 +80,29 @@ ServiceError service_generate(struct Service_Request* req, struct Service_Respon
     return SUCCESS;
 }
 
+ServiceError service_settings(struct Service_Request* req, struct Service_Response* res){
+    if(res->response!=NULL) return RESPONSE_NOT_EMPTY;
+
+    char buffer[2048] = {'\0'};
+    sprintf(buffer,"asciigenerator!>%s>You have requested the %s service, sadly this is still unavailable",req->username,service_to_string(req->service));
+
+    SettingKey key = parse_settingkey(req->parameterlist[0]);
+    if(key == SETTING_INVALID){
+        return WRONG_ARUMENTS;
+    }
+    
+    ServiceError result = set_settings(req->username,key,req->parameterlist[1]);
+    if(result!=SUCCESS){
+        return result;
+    }
+
+    res->size = strlen(buffer);
+    res->response = malloc(res->size);
+    memcpy(res->response,buffer,res->size);
+
+    return SUCCESS;
+}
+
 ServiceError service_invalid(struct Service_Request* req, struct Service_Response* res){
     if(res->response!=NULL) return RESPONSE_NOT_EMPTY;
 
@@ -92,4 +115,6 @@ ServiceError service_invalid(struct Service_Request* req, struct Service_Respons
 
     return SUCCESS;
 }
+
+
 

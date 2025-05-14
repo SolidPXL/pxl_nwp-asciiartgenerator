@@ -63,6 +63,26 @@ ServiceError parse_request(uint8_t* buffer,uint32_t size, struct Service_Request
     }
 }
 
+ServiceError fetch_settings(char* user, struct User_Settings* settings){
+    if (user==NULL || settings==NULL) {
+        return WRONG_ARUMENTS;
+    }
+    //Get current setting if exists, if not create settings file
+    char filename[256];
+    snprintf(filename, sizeof(filename), "./users/%s.settings", user);
+
+    FILE* file = fopen(filename, "rb");
+
+    if (file) {
+        // Read existing settings
+        if (fread(settings, sizeof(struct User_Settings), 1, file) != 1) {
+            fclose(file);
+            return OTHER_ERROR;
+        }
+        fclose(file);
+    }
+}
+
 void handle_error(ServiceError error, struct Service_Request* req, struct Service_Response* res){
     if(res->response!=NULL) return;
     char buffer[2048] = {'\0'};
@@ -284,7 +304,7 @@ uint8_t* generate_text(uint8_t* font, uint8_t* text,uint8_t size ,uint8_t spacin
 
     uint8_t fontheights[16] = {0};//Assuming there are not more than 16 fonts height variations not exceeding 32 characters high
     uint16_t lines_per_font = 0;
-    Generator_Overlap overlap = NOOVERLAP;
+    GeneratorOverlap overlap = NOOVERLAP;
     
     uint8_t* tok = strtok(header_buf,";");
     tok = strtok(NULL,";");
@@ -421,3 +441,75 @@ uint8_t* generate_text(uint8_t* font, uint8_t* text,uint8_t size ,uint8_t spacin
 
     
 };
+
+SettingKey parse_settingkey(char* str){
+    if(strcmp(str,"color")==0){
+        return SETTING_COLOR;
+    } else {
+        return SETTING_INVALID;
+    }
+
+}
+
+ANSIColor parse_color(char* value) {
+    if (strcmp(value, "reset") == 0) return ANSI_RESET;
+    if (strcmp(value, "black") == 0) return ANSI_BLACK;
+    if (strcmp(value, "red") == 0) return ANSI_RED;
+    if (strcmp(value, "green") == 0) return ANSI_GREEN;
+    if (strcmp(value, "yellow") == 0) return ANSI_YELLOW;
+    if (strcmp(value, "blue") == 0) return ANSI_BLUE;
+    if (strcmp(value, "purple") == 0) return ANSI_PURPLE;
+    if (strcmp(value, "cyan") == 0) return ANSI_CYAN;
+    if (strcmp(value, "white") == 0) return ANSI_WHITE;
+    return ANSI_RESET; // default fallback
+}
+
+ServiceError set_settings(char* user,SettingKey key, char* value){
+    if (user==NULL || value==NULL || key == SETTING_INVALID) {
+        return WRONG_ARUMENTS;
+    }
+    //Get current setting if exists, if not create settings file
+    char filename[256];
+    snprintf(filename, sizeof(filename), "./users/%s.settings", user);
+
+    FILE* file = fopen(filename, "rb");
+    struct User_Settings settings;
+
+    if (file) {
+        // Read existing settings
+        if (fread(&settings, sizeof(struct User_Settings), 1, file) != 1) {
+            fclose(file);
+            return OTHER_ERROR;
+        }
+        fclose(file);
+    } else {
+        // Initialize defaults if file doesn't exist
+        settings.color = ANSI_RESET;
+    }
+    printf("Loaded file of %s which has color set to %d\n",user,settings.color);
+
+    //Parse value depending on key + set value
+
+    switch (key) {
+        case SETTING_COLOR:
+            settings.color = parse_color(value);
+            break;
+        default:
+            return WRONG_ARUMENTS;
+    }
+
+    //save settings
+    file = fopen(filename, "wb");
+    if (!file) {
+        return OTHER_ERROR;
+    }
+
+    if (fwrite(&settings, sizeof(struct User_Settings), 1, file) != 1) {
+        fclose(file);
+        return OTHER_ERROR;
+    }
+
+    fclose(file);
+    return SUCCESS;
+
+}

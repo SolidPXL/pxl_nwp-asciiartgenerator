@@ -34,7 +34,27 @@ enum Service_Error{
     OTHER_ERROR
 };
 
-typedef enum Generator_Overlap Generator_Overlap;
+typedef enum ANSI_Color ANSIColor;
+enum ANSI_Color{
+    ANSI_RESET,
+    ANSI_BLACK,
+    ANSI_RED,
+    ANSI_GREEN,
+    ANSI_YELLOW,
+    ANSI_BLUE,
+    ANSI_PURPLE,
+    ANSI_CYAN,
+    ANSI_WHITE
+};
+
+typedef enum Setting_Key SettingKey;
+enum Setting_Key{
+    SETTING_INVALID,
+    SETTING_COLOR
+};
+
+
+typedef enum Generator_Overlap GeneratorOverlap;
 enum Generator_Overlap{
     NOOVERLAP,
     LEFTONTOP,
@@ -42,10 +62,15 @@ enum Generator_Overlap{
     PRIORITY
 };
 
+struct User_Settings{
+    ANSIColor color;
+};
+
 struct Service_Request {
     uint8_t username[64];
     enum Service service;
     uint8_t* parameterlist[8];
+    struct User_Settings settings;
 };
 
 struct Service_Response{
@@ -53,11 +78,11 @@ struct Service_Response{
     uint8_t* response;
 };
 
-
 Service parse_service(char* buf);
 char* service_to_string(Service service);
 
 ServiceError parse_request(uint8_t* buffer,uint32_t size, struct Service_Request* req);
+ServiceError fetch_settings(char* user, struct User_Settings* settings);
 
 void handle_error(ServiceError error, struct Service_Request* req, struct Service_Response* res);
 void send_response(void* socket, struct Service_Response*);
@@ -70,5 +95,10 @@ void print_request(struct Service_Request* req);
 uint8_t** get_fonts();
 
 uint8_t* generate_text(uint8_t* font, uint8_t* text,uint8_t size,uint8_t spacing);
+
+SettingKey parse_settingkey(char* str);
+ANSIColor parse_color(char* value);
+
+ServiceError set_settings(char* user, SettingKey key, char* value);
 
 #endif
