@@ -464,6 +464,21 @@ ANSIColor parse_color(char* value) {
     return ANSI_RESET; // default fallback
 }
 
+const char* ansi_color_to_str(ANSIColor color) {
+    switch (color) {
+        case ANSI_RESET:  return "\033[0m";
+        case ANSI_BLACK:  return "\033[30m";
+        case ANSI_RED:    return "\033[31m";
+        case ANSI_GREEN:  return "\033[32m";
+        case ANSI_YELLOW: return "\033[33m";
+        case ANSI_BLUE:   return "\033[34m";
+        case ANSI_PURPLE: return "\033[35m";
+        case ANSI_CYAN:   return "\033[36m";
+        case ANSI_WHITE:  return "\033[37m";
+        default:          return "\033[0m";  // Fallback to reset
+    }
+}
+
 ServiceError set_settings(struct User_Settings* settings,char* user,SettingKey key, char* value){
     if (user==NULL || value==NULL || key == SETTING_INVALID) {
         return WRONG_ARUMENTS;

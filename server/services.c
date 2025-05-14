@@ -61,13 +61,19 @@ ServiceError service_generate(struct Service_Request* req, struct Service_Respon
     if(res->response!=NULL) return RESPONSE_NOT_EMPTY;
 
     char buffer[2048] = {'\0'};
-    sprintf(buffer,"asciigenerator!>%s>\n",req->username);
+    //sprintf(buffer,"asciigenerator!>%s>\n",req->username);
 
     uint8_t* text = generate_text(req->parameterlist[0],req->parameterlist[2],atoi(req->parameterlist[1]),1);
     if(text==NULL){
         return OTHER_ERROR;
     }
-    strcat(buffer,text);
+    sprintf(buffer,"asciigenerator!>%s>%s\n%s%s",
+        req->username,
+        ansi_color_to_str(req->settings.color),
+        text,
+        ansi_color_to_str(ANSI_RESET)
+    );
+    //strcat(buffer,text);
     // uint16_t len = strlen(buffer);
     // buffer[len-2]='\0';
 
@@ -84,7 +90,7 @@ ServiceError service_settings(struct Service_Request* req, struct Service_Respon
     if(res->response!=NULL) return RESPONSE_NOT_EMPTY;
 
     char buffer[2048] = {'\0'};
-    sprintf(buffer,"asciigenerator!>%s>You have requested the %s service, sadly this is still unavailable",req->username,service_to_string(req->service));
+    
 
     SettingKey key = parse_settingkey(req->parameterlist[0]);
     if(key == SETTING_INVALID){
@@ -95,6 +101,12 @@ ServiceError service_settings(struct Service_Request* req, struct Service_Respon
     if(result!=SUCCESS){
         return result;
     }
+
+    sprintf(buffer,"asciigenerator!>%s>%sSuccessfully set setting%s",
+        req->username,
+        ansi_color_to_str(req->settings.color),
+        ansi_color_to_str(ANSI_RESET)
+    );
 
     res->size = strlen(buffer);
     res->response = malloc(res->size);
