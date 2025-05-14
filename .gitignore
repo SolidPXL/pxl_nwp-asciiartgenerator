@@ -1,3 +1,5 @@
 *.exe
 .vscode
 **/main
+server/server
+client/server
