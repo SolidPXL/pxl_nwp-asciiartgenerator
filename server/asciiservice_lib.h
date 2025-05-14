@@ -98,7 +98,8 @@ uint8_t* generate_text(uint8_t* font, uint8_t* text,uint8_t size,uint8_t spacing
 
 SettingKey parse_settingkey(char* str);
 ANSIColor parse_color(char* value);
+const char* ansi_color_to_str(ANSIColor color);
 
-ServiceError set_settings(char* user, SettingKey key, char* value);
+ServiceError set_settings(struct User_Settings* settings,char* user,SettingKey key, char* value);
 
 #endif

@@ -90,8 +90,8 @@ ServiceError service_settings(struct Service_Request* req, struct Service_Respon
     if(key == SETTING_INVALID){
         return WRONG_ARUMENTS;
     }
-    
-    ServiceError result = set_settings(req->username,key,req->parameterlist[1]);
+
+    ServiceError result = set_settings(&(req->settings),req->username,key,req->parameterlist[1]);
     if(result!=SUCCESS){
         return result;
     }

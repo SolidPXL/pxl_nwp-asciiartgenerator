@@ -464,35 +464,20 @@ ANSIColor parse_color(char* value) {
     return ANSI_RESET; // default fallback
 }
 
-ServiceError set_settings(char* user,SettingKey key, char* value){
+ServiceError set_settings(struct User_Settings* settings,char* user,SettingKey key, char* value){
     if (user==NULL || value==NULL || key == SETTING_INVALID) {
         return WRONG_ARUMENTS;
     }
-    //Get current setting if exists, if not create settings file
     char filename[256];
     snprintf(filename, sizeof(filename), "./users/%s.settings", user);
 
-    FILE* file = fopen(filename, "rb");
-    struct User_Settings settings;
-
-    if (file) {
-        // Read existing settings
-        if (fread(&settings, sizeof(struct User_Settings), 1, file) != 1) {
-            fclose(file);
-            return OTHER_ERROR;
-        }
-        fclose(file);
-    } else {
-        // Initialize defaults if file doesn't exist
-        settings.color = ANSI_RESET;
-    }
-    printf("Loaded file of %s which has color set to %d\n",user,settings.color);
+    FILE* file = NULL;
 
     //Parse value depending on key + set value
 
     switch (key) {
         case SETTING_COLOR:
-            settings.color = parse_color(value);
+            settings->color = parse_color(value);
             break;
         default:
             return WRONG_ARUMENTS;
@@ -504,7 +489,7 @@ ServiceError set_settings(char* user,SettingKey key, char* value){
         return OTHER_ERROR;
     }
 
-    if (fwrite(&settings, sizeof(struct User_Settings), 1, file) != 1) {
+    if (fwrite(settings, sizeof(struct User_Settings), 1, file) != 1) {
         fclose(file);
         return OTHER_ERROR;
     }
