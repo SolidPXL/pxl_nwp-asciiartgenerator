@@ -28,16 +28,11 @@ jobs:
         mv client/client client-linux
         mv server/server server-linux
 
-    - name: Upload client binary
+    - name: Upload binaries
       uses: softprops/action-gh-release@v2
       with:
-        files: client-linux
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-
-    - name: Upload server binary
-      uses: softprops/action-gh-release@v2
-      with:
-        files: server-linux
+        files: |
+          client-linux
+          server-linux
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PAT }}
