@@ -1,5 +1,4 @@
 *.exe
-*.elf
 .vscode
 **/main
 server/server
