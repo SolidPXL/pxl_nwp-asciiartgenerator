@@ -84,12 +84,33 @@ ServiceError fetch_settings(char* user, struct User_Settings* settings){
 }
 
 void handle_error(ServiceError error, struct Service_Request* req, struct Service_Response* res){
-    if(res->response!=NULL) return;
+    //Clean response if full
+    if(res->response!=NULL){
+        free(res->response);
+        res->size=0;
+    };
+
     char buffer[2048] = {'\0'};
     switch (error)
     {
         case NOT_ENOUGH_ARGUMENTS: {
             sprintf(buffer,"asciigenerator!>%s>Not enough arguments were provided.",req->username);
+            break;
+        }
+        case TOO_MANY_ARGUMENTS: {
+            sprintf(buffer,"asciigenerator!>%s>Too many arguments were provided",req->username);
+            break;
+        }
+        case WRONG_ARUMENTS: {
+            sprintf(buffer,"asciigenerator!>%s>Arguments could not be parsed",req->username);
+            break;
+        }
+        case FONT_NOT_FOUND: {
+            sprintf(buffer,"asciigenerator!>%s>Did not find the requested font",req->username);
+            break;
+        }
+        case FILESYSTEM_ERROR: {
+            sprintf(buffer,"asciigenerator!>%s>Server side error, Please contact Axel (FSE)",req->username);
             break;
         }
         default: {
@@ -501,12 +522,12 @@ ServiceError set_settings(struct User_Settings* settings,char* user,SettingKey k
     //save settings
     file = fopen(filename, "wb");
     if (!file) {
-        return OTHER_ERROR;
+        return FILESYSTEM_ERROR;
     }
 
     if (fwrite(settings, sizeof(struct User_Settings), 1, file) != 1) {
         fclose(file);
-        return OTHER_ERROR;
+        return FILESYSTEM_ERROR;
     }
 
     fclose(file);

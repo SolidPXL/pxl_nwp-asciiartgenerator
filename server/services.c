@@ -60,6 +60,8 @@ ServiceError service_fonts(struct Service_Request* req, struct Service_Response*
 ServiceError service_generate(struct Service_Request* req, struct Service_Response* res){
     if(res->response!=NULL) return RESPONSE_NOT_EMPTY;
 
+    if(req->parameterlist[0]==NULL||req->parameterlist[1]==NULL||req->parameterlist[2]==NULL)return NOT_ENOUGH_ARGUMENTS;
+
     char buffer[2048] = {'\0'};
     //sprintf(buffer,"asciigenerator!>%s>\n",req->username);
 
@@ -73,9 +75,6 @@ ServiceError service_generate(struct Service_Request* req, struct Service_Respon
         text,
         ansi_color_to_str(ANSI_RESET)
     );
-    //strcat(buffer,text);
-    // uint16_t len = strlen(buffer);
-    // buffer[len-2]='\0';
 
     res->size = strlen(buffer);
     res->response = malloc(res->size);

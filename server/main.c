@@ -91,7 +91,9 @@ int main( int argc, char * argv[] )
         };
         result = servicefunc[req.service](&req,&res);
         if(result!=SUCCESS){
-            //Error handling
+            handle_error(result,&req,&res);
+            send_and_clean_response(sender,&res);
+            continue;
         }
 
         print_request(&req);

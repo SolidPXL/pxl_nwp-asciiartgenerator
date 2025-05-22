@@ -31,6 +31,7 @@ enum Service_Error{
     WRONG_ARUMENTS,
     RESPONSE_NOT_EMPTY,
     FONT_NOT_FOUND,
+    FILESYSTEM_ERROR,
     OTHER_ERROR
 };
 
