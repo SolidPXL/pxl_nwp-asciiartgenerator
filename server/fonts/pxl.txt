@@ -1,0 +1,469 @@
+8;0
+A;8;5;0;0
+  A  
+  A  
+ A A 
+ A A 
+ A A 
+AAAAA
+A   A
+A   A
+B;8;4;0;0
+BBB
+B  B
+B  B
+BBB
+B  B
+B  B
+B  B
+BBBB
+C;8;4;0;0
+ CC 
+C  C
+C   
+C   
+C   
+C   
+C  C
+ CC 
+D;8;4;0;0
+DDD 
+D  D
+D  D
+D  D
+D  D
+D  D
+D  D
+DDD 
+E;8;4;0;0
+EEEE
+E   
+E   
+EEEE
+E   
+E   
+E   
+EEEE
+F;8;4;0;0
+FFFF
+F   
+F   
+FFFF
+F   
+F   
+F   
+F   
+G;8;5;0;0
+ GGGG
+G    
+G    
+G    
+G GGG
+G   G
+ G  G
+  GG 
+H;8;5;0;0
+H   H
+H   H
+H   H
+HHHHH
+H   H
+H   H
+H   H
+H   H
+I;8;3;0;0
+III
+ I 
+ I 
+ I 
+ I 
+ I 
+ I 
+III
+J;8;4;0;0
+JJJJ
+  J 
+  J 
+  J 
+  J 
+  J 
+J J 
+ J  
+K;8;5;0;0
+K   K
+K  K 
+K K  
+KK    
+K K  
+K  K 
+K   K
+K   K
+L;8;4;0;0
+L   
+L   
+L   
+L   
+L   
+L   
+L   
+LLLL
+M;8;11;0;0
+   M   M   
+  M M M M  
+ M   M   M 
+M    M    M
+M    M    M
+M    M    M
+M    M    M
+M    M    M
+N;8;7;0;0
+N     N
+NN    N
+N N   N
+N  N  N
+N   N N
+N    NN
+N     N
+N     N
+O;8;4;0;0
+OOOO
+O  O
+O  O
+O  O
+O  O
+O  O
+O  O
+OOOO
+P;8;4;0;0
+PPPP
+P  P
+P  P
+PPPP
+P   
+P   
+P   
+P   
+Q;8;5;0;0
+QQQQQ
+Q   Q
+Q   Q
+Q   Q
+Q   Q
+Q Q Q
+Q  QQ
+QQQQQ
+R;8;5;0;0
+RRRRR
+R   R
+R   R
+RRRRR
+RR   
+R R  
+R  R 
+R   R
+S;8;4;0;0
+SSSS
+S   
+S   
+SSSS
+   S
+   S
+   S
+SSSS
+T;8;3;0;0
+TTT
+ T 
+ T 
+ T 
+ T 
+ T 
+ T 
+ T 
+U;8;5;0;0
+U   U
+U   U
+U   U
+U   U
+U   U
+U   U
+U   U
+UUUUU
+V;8;5;0;0
+V   V
+V   V
+V   V
+V   V
+ V V 
+ V V 
+  V  
+  V  
+W;8;11;0;0
+W    W    W
+W    W    W
+W    W    W
+W    W    W
+W    W    W
+ W   W   W 
+  W W W W  
+   W   W   
+X;8;5;0;0
+X   X
+X   X
+ X X 
+  X  
+  X  
+ X X 
+X   X
+X   X
+Y;8;5;0;0
+Y   Y
+Y   Y
+ Y Y 
+  Y  
+  Y   
+  Y   
+  Y   
+  Y   
+Z;8;6;0;0
+ZZZZZZ
+     Z
+    Z
+   Z
+  Z
+ Z
+Z
+ZZZZZZ
+a;8;4;0;0
+    
+    
+    
+ aaa
+a  a
+a  a
+a  a
+ aaa
+b;8;4;0;0
+b   
+b   
+b   
+bbb 
+b  b
+b  b
+b  b
+bbbb
+c;8;3;0;0
+   
+   
+   
+ cc
+c
+c
+c
+ cc
+d;8;4;0;0
+   d
+   d
+   d
+ ddd
+d  d
+d  d
+d  d
+dddd
+e;8;4;0;0
+    
+    
+    
+ ee 
+e  e
+eee 
+e   
+ eee
+f;8;4;0;0
+ fff
+f   
+f   
+fff 
+f   
+f   
+f   
+f   
+g;8;4;0;0
+ gg 
+g  g
+g  g
+ gg 
+   g
+   g
+   g
+ggg 
+h;8;4;0;0
+h
+h
+h
+hhh 
+h  h
+h  h
+h  h
+h  h
+i;8;1;0;0
+ 
+i
+ 
+i
+i
+i
+i
+i
+j;8;2;0;0
+  
+ j
+  
+ j
+ j
+ j
+ j
+j 
+k;8;4;0;0
+    
+    
+k   
+k  k
+k k 
+kk  
+k k 
+k  k
+l;8;1;0;0
+ 
+l
+l
+l
+l
+l
+l
+l
+m;8;7;0;0
+       
+       
+       
+ mm mm  
+m  m  m
+m  m  m
+m  m  m
+m  m  m
+n;8;4;0;0
+    
+    
+    
+nnn 
+n  n
+n  n
+n  n
+n  n
+o;8;4;0;0
+    
+    
+    
+oooo
+o  o
+o  o
+o  o
+oooo
+p;8;4;0;0
+    
+ppp 
+p  p
+p  p
+ppp 
+p   
+p   
+p   
+q;8;4;0;0
+    
+ qqq
+q  q
+q  q
+ qqq
+   q
+   q
+   q
+r;8;4;0;0
+    
+    
+    
+rrr 
+r  r
+r   
+r   
+r   
+s;8;4;0;0
+    
+    
+    
+ssss
+s
+ssss
+   s
+ssss
+t;8;3;0;0
+   
+ t 
+ttt
+ t 
+ t 
+ t 
+ t 
+  t
+u;8;4;0;0
+    
+    
+    
+u  u
+u  u
+u  u
+u  u
+uuuu
+v;8;5;0;0
+     
+     
+     
+v   v
+v   v
+ v v 
+ v v  
+  v   
+w;8;7;0;0
+       
+       
+       
+w  w  w
+w  w  w
+w  w  w
+w  w  w
+ ww ww 
+x;8;3;0;0
+   
+   
+   
+x x
+x x
+ x 
+x x
+x x
+y;8;5;0;0
+     
+     
+     
+y   y
+ y y 
+  y  
+  y  
+ y   
+z;8;4;0;0
+    
+    
+    
+zzzz
+   z
+  z
+ z
+zzzz

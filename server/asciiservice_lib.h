@@ -93,6 +93,7 @@ void clean_res(struct Service_Response* req);
 
 void print_request(struct Service_Request* req);
 
+void remove_extension(char *filename);
 uint8_t** get_fonts();
 
 uint8_t* generate_text(uint8_t* font, uint8_t* text,uint8_t size,uint8_t spacing);

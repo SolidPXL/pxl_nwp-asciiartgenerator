@@ -11,6 +11,8 @@
 #ifdef __unix__
     #include <unistd.h>
     #include <time.h>
+    #include <pthread.h>
+    #include <sys/inotify.h>
 
     static inline void Sleep(unsigned int milliseconds) {
         struct timespec ts;
@@ -22,6 +24,63 @@
     #include <windows.h>
 
 #endif
+
+#define EVENT_SIZE  (sizeof(struct inotify_event))
+#define EVENT_BUF_LEN     (1024 * (EVENT_SIZE + 16))
+#define WATCH_DIR         "fonts"  // Replace with the directory you want to watch
+
+void* directory_monitor_thread(void* sender) {
+    int fd, wd;
+    char buffer[EVENT_BUF_LEN];
+
+    fd = inotify_init();
+    if (fd < 0) {
+        perror("inotify_init");
+        pthread_exit(NULL);
+    }
+
+    wd = inotify_add_watch(fd, WATCH_DIR, IN_CREATE);
+    if (wd == -1) {
+        perror("inotify_add_watch");
+        close(fd);
+        pthread_exit(NULL);
+    }
+
+    printf("Monitoring directory: %s\n", WATCH_DIR);
+
+    while (1) {
+        int length = read(fd, buffer, EVENT_BUF_LEN);
+        if (length < 0) {
+            perror("read");
+            break;
+        }
+
+        int i = 0;
+        while (i < length) {
+            struct inotify_event *event = (struct inotify_event *) &buffer[i];
+            if (event->len) {
+                if (event->mask & IN_CREATE) {
+                    if (!(event->mask & IN_ISDIR)) {
+                        printf("File created: %s\n", event->name);
+                        char fontbuf[64];
+                        strcpy(fontbuf,event->name);
+                        remove_extension(fontbuf);
+
+                        char anounce[256];
+                        sprintf(anounce, "asciigenerator!>broadcast>%s",fontbuf);
+	                    zmq_send( sender, anounce, strlen(anounce), 0 );
+                        // TODO: Place your code here to handle the new file
+                    }
+                }
+            }
+            i += EVENT_SIZE + event->len;
+        }
+    }
+
+    inotify_rm_watch(fd, wd);
+    close(fd);
+    pthread_exit(NULL);
+}
 
 void * context;
 
@@ -43,6 +102,15 @@ int main( int argc, char * argv[] )
 
     sleep(1);
     //Receiving requests
+
+    //Start monitoring thread
+    pthread_t monitor_thread;
+
+    if (pthread_create(&monitor_thread, NULL, directory_monitor_thread, sender) != 0) {
+        perror("Failed to create thread");
+        return 1;
+    }
+
     while(1){
         char buffer[256] = {'\0'};
         int size = zmq_recv(receiver,buffer,sizeof(buffer),0);
